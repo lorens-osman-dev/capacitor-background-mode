@@ -1,0 +1,7 @@
+{
+  "name": "backrrr",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

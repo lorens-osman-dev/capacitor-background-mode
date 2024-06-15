@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">backrrr</string>
+    <string name="title_activity_main">backrrr</string>
+    <string name="package_name">com.backrrr</string>
+    <string name="custom_url_scheme">com.backrrr</string>
+</resources>
