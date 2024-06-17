@@ -1,49 +1,68 @@
 <script setup lang="ts">
-import { App } from '@capacitor/app';
-import { LocalNotifications } from '@capacitor/local-notifications';
-import { BackgroundTask } from '@capawesome/capacitor-background-task';
+import { App } from "@capacitor/app";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { onMounted, onBeforeUnmount } from "vue";
+import { BackgroundMode } from "@anuradev/capacitor-background-mode";
 
 onMounted(() => {
+	App.addListener("appStateChange", async (state) => {
+		// App in background
+		if (!state.isActive) {
+			// i want to enable background mode here
+			await BackgroundMode.setSettings({
+				channelName: "channelName",
+				bigText: true,
+				channelDescription: "channelDescription",
+				closeTitle: "close",
+				text: "text",
+				subText: "subText",
+				title: "title",
+				visibility: "public",
+			});
 
-  App.addListener("backButton", async (ev) => {
-    LocalNotifications.schedule({ notifications: [{ id: 1, title: "back", body: "back pressd" }] })
-  })
-  App.addListener("appStateChange", async (state) => {
-    if (state.isActive) {
-      return
-    }
-    LocalNotifications.schedule({ notifications: [{ id: 1, title: "exit", body: "exit" }] })
-    const taskId = await BackgroundTask.beforeExit(async () => {
-      LocalNotifications.schedule({ notifications: [{ id: 2, title: "exit222", body: "exit222" }] })
-      // Run your code...
-      // Finish the background task as soon as everything is done.
-      BackgroundTask.finish({ taskId });
-    });
-  })
-  App.addListener("resume", async () => {
+			await BackgroundMode.enable();
+		} else {
+			// App in foreground
 
-    LocalNotifications.schedule({ notifications: [{ id: 1, title: "resume", body: "resume" }] })
-  })
+			await BackgroundMode.requestNotificationsPermission();
+		}
+	});
 
+	BackgroundMode.addListener("appInBackground", () => {
+		// i want to run this task every 3 minutes
+		setInterval(
+			async () => {
+				const battery = await BackgroundMode.checkBatteryOptimizations();
+				const ForegroundPermission =
+					await BackgroundMode.checkForegroundPermission();
+				const noti = await BackgroundMode.checkNotificationsPermission();
+				const isActive = await BackgroundMode.isActive();
+				const isEnabled = await BackgroundMode.isEnabled();
+				const data = `checkBatteryOptimizations : ${battery.disabled} ,checkForegroundPermission:${ForegroundPermission.display} , isActive:${isActive.activated}, isEnabled:${isEnabled.enabled}`;
+				LocalNotifications.schedule({
+					notifications: [
+						{ id: 2, title: "exit222", body: data, largeBody: data },
+					],
+				});
+			},
+			1000 * 60 * 3,
+		);
+	});
 });
 
-onBeforeUnmount(() => {
-  App.removeAllListeners()
-});
-
-
-//- normal notification 
-function ss() {
-  LocalNotifications.schedule({ notifications: [{ id: 1, title: "normal", body: "normal" }] })
+//- normal notification
+function fireNormalNotification() {
+	LocalNotifications.schedule({
+		notifications: [{ id: 1, title: "normal", body: "normal" }],
+	});
 }
 </script>
 
 <template>
   hiiiiiiiiiii
-
-  <button @click="ss">run</button>
+  <br>
+  <button @click="fireNormalNotification">Fire Normal Notification</button>
 
 </template>
 
-<style scoped></style>
+<style scoped></style>async

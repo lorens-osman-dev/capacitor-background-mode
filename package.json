@@ -13,6 +13,7 @@
     "ionic:serve": "npm run dev"
   },
   "dependencies": {
+    "@anuradev/capacitor-background-mode": "^2.0.8",
     "@capacitor/android": "6.1.0",
     "@capacitor/app": "6.0.0",
     "@capacitor/cli": "6.1.0",
